@@ -200,11 +200,15 @@ describe 'endpoints API' do
       }
 
       let(:'X-RH-IDENTITY') { encoded_header }
-      let(:id) do
+      let(:endpoint_object) do
         endpoint = FactoryBot.build(:endpoint)
         endpoint.account = account
         endpoint.save!
-        endpoint.id
+        endpoint
+      end
+
+      let(:id) do
+        endpoint_object.id
       end
 
       response '200', 'endpoint updated' do
@@ -222,6 +226,77 @@ describe 'endpoints API' do
           endpoint = Endpoint.find(id)
           expect(endpoint.url).to eq('foo')
           expect(endpoint.name).to eq('bar')
+        end
+      end
+
+      response '200', 'endpoint updated' do
+        let(:endpoint) do
+          {
+            endpoint: {
+              url: 'foo',
+              name: 'bar',
+              filters: [
+                {
+                  app_ids: [],
+                  event_type_ids: [],
+                  level_ids: []
+                }
+              ]
+            }
+          }
+        end
+
+        schema type: :object,
+               properties: {
+                 data: endpoint_spec
+               }
+
+        before { |example| submit_request example.metadata }
+
+        it 'returns a valid 200 response' do |example|
+          assert_response_matches_metadata(example.metadata)
+
+          endpoint = Endpoint.includes(:filters).find(id)
+          expect(endpoint.url).to eq('foo')
+          expect(endpoint.name).to eq('bar')
+          expect(endpoint.filters.count).to eq(1)
+        end
+      end
+
+      response '200', 'endpoint updated' do
+        let(:endpoint_filter) do
+          endpoint_object.filters.create(account: endpoint_object.account)
+        end
+
+        let(:endpoint) do
+          {
+            endpoint: {
+              url: 'foo',
+              name: 'bar',
+              filters: [
+                {
+                  id: endpoint_filter.id,
+                  _destroy: true
+                }
+              ]
+            }
+          }
+        end
+
+        schema type: :object,
+               properties: {
+                 data: endpoint_spec
+               }
+
+        before { |example| submit_request example.metadata }
+
+        it 'returns a valid 200 response' do |example|
+          assert_response_matches_metadata(example.metadata)
+
+          endpoint = Endpoint.includes(:filters).find(id)
+          expect(endpoint.url).to eq('foo')
+          expect(endpoint.name).to eq('bar')
+          expect(endpoint.filters.count).to eq(0)
         end
       end
     end
