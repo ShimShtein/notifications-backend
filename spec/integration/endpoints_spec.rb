@@ -9,6 +9,16 @@ endpoint_spec = {
                           :filter_count => :integer)
 }.merge simple_spec(%i[type id] => :string)
 
+incoming_endpoint_spec = simple_spec(
+  %i[name type url] => :string,
+  :active => :boolean
+).merge(
+  filters: {
+    type: :array,
+    items: incoming_filter_spec
+  }
+)
+
 # rubocop:disable Metrics/BlockLength
 describe 'endpoints API' do
   path '/r/insights/platform/notifications/endpoints' do
@@ -66,12 +76,7 @@ describe 'endpoints API' do
       parameter name: :'X-RH-IDENTITY', in: :header, schema: { type: :string }
       parameter name: :endpoint, in: :body, schema: {
         type: :object,
-        properties: simple_spec(%i[name type url] => :string, :active => :boolean).merge(
-          filters: {
-            type: :array,
-            items: incoming_filter_spec
-          }
-        ),
+        properties: incoming_endpoint_spec,
         required: %w[name url type]
       }
 
@@ -196,7 +201,13 @@ describe 'endpoints API' do
       parameter name: :id, :in => :path, :type => :integer
       parameter name: :endpoint, in: :body, schema: {
         type: :object,
-        properties: simple_spec(%i[name type url] => :string, :active => :boolean)
+        properties: incoming_endpoint_spec.deep_merge(
+          filters: {
+            items: {
+              properties: simple_spec(_destroy: :boolean)
+            }
+          }
+        )
       }
 
       let(:'X-RH-IDENTITY') { encoded_header }
