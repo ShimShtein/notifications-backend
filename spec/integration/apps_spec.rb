@@ -117,7 +117,7 @@ describe 'apps API' do
                  included: included_event_type_spec,
                  meta: {
                    type: :object,
-                   properties: simple_spec(%i[page per_page total] => :integer)
+                   properties: simple_spec(%i[page per_page total limit offset] => :integer)
                  }
                }
         examples 'application/json' => {
@@ -153,7 +153,9 @@ describe 'apps API' do
           meta: {
             page: 1,
             per_page: 10,
-            total: 1
+            total: 1,
+            limit: nil,
+            offset: nil
           }
         }
 

@@ -32,6 +32,8 @@ describe 'endpoints API' do
       parameter name: :page, in: :query, type: :integer, required: false
       parameter name: :per_page, in: :query, type: :integer, required: false
       parameter name: :order, in: :query, type: :string, required: false
+      parameter name: :limit, in: :query, type: :integer, required: false
+      parameter name: :offset, in: :query, type: :integer, required: false
 
       response '200', 'lists all endpoints requested' do
         let(:'X-RH-IDENTITY') { encoded_header }
@@ -45,7 +47,7 @@ describe 'endpoints API' do
                  },
                  meta: {
                    type: :object,
-                   properties: simple_spec(%i[page per_page total] => :integer)
+                   properties: simple_spec(%i[page per_page total limit offset] => :integer)
                  }
                }
         examples 'application/json' => {
@@ -64,7 +66,9 @@ describe 'endpoints API' do
           meta: {
             page: 1,
             per_page: 10,
-            total: 2
+            total: 2,
+            limit: nil,
+            offset: nil
           }
         }
 
