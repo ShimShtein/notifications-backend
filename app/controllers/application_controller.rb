@@ -41,20 +41,6 @@ class ApplicationController < ActionController::API
   end
 
   def paginate(scope)
-    raise BadRequest, 'Both page and offset pagination is not allowed' if page_pagination? && offset_pagination?
-
-    limit_query(scope.paginate(:per_page => params[:per_page] || 10, :page => params[:page] || 1))
-  end
-
-  def page_pagination?
-    params[:per_page] || params[:page]
-  end
-
-  def offset_pagination?
-    params[:limit] || params[:offset]
-  end
-
-  def limit_query(scope)
     limited_scope = scope
     if params[:limit]
       limit = params[:limit].to_i
@@ -108,12 +94,10 @@ class ApplicationController < ActionController::API
 
   def index_meta(scope)
     meta = {
-      :total => scope.count,
-      :per_page => scope.per_page,
-      :page => scope.current_page
+      :total => scope.limit(nil).offset(nil).count
     }
-    meta[:limit] = scope.limit_value if scope.respond_to?(:limit_value)
-    meta[:offset] = scope.offset_value if scope.respond_to?(:offset_value)
+    meta[:limit] = scope.limit_value if scope.respond_to?(:limit_value) && scope.limit_value
+    meta[:offset] = scope.offset_value if scope.respond_to?(:offset_value) && scope.offset_value
     meta
   end
 
