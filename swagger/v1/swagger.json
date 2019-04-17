@@ -215,6 +215,23 @@
                       "type": "integer"
                     }
                   }
+                },
+                "links": {
+                  "type": "object",
+                  "properties": {
+                    "first": {
+                      "type": "string"
+                    },
+                    "last": {
+                      "type": "string"
+                    },
+                    "next": {
+                      "type": "string"
+                    },
+                    "previous": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             },
@@ -278,8 +295,8 @@
                 ],
                 "meta": {
                   "total": 1,
-                  "limit": null,
-                  "offset": null
+                  "limit": 100,
+                  "offset": 0
                 }
               }
             }
@@ -573,6 +590,23 @@
                     },
                     "offset": {
                       "type": "integer"
+                    }
+                  }
+                },
+                "links": {
+                  "type": "object",
+                  "properties": {
+                    "first": {
+                      "type": "string"
+                    },
+                    "last": {
+                      "type": "string"
+                    },
+                    "next": {
+                      "type": "string"
+                    },
+                    "previous": {
+                      "type": "string"
                     }
                   }
                 }
@@ -1081,6 +1115,23 @@
                   "properties": {
                     "total": {
                       "type": "integer"
+                    }
+                  }
+                },
+                "links": {
+                  "type": "object",
+                  "properties": {
+                    "first": {
+                      "type": "string"
+                    },
+                    "last": {
+                      "type": "string"
+                    },
+                    "next": {
+                      "type": "string"
+                    },
+                    "previous": {
+                      "type": "string"
                     }
                   }
                 }

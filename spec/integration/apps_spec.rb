@@ -120,6 +120,10 @@ describe 'apps API' do
                  meta: {
                    type: :object,
                    properties: simple_spec(%i[total limit offset] => :integer)
+                 },
+                 links: {
+                   type: :object,
+                   properties: simple_spec(%i[first last next previous] => :string)
                  }
                }
         examples 'application/json' => {

@@ -6,6 +6,7 @@ class ApplicationController < ActionController::API
   include Pundit
   include Authentication
   include Params
+  include PaginationParameters
 
   class UnknownOrder < RuntimeError; end
   class BadRequest < RuntimeError; end
@@ -88,17 +89,30 @@ class ApplicationController < ActionController::API
     scope = policy_scope(base)
     scope = order(scope, default_sort, allowed_sort_keys) if default_sort
     scope = paginate(scope)
-    meta = index_meta(scope)
-    render :json => serializer_class.new(scope, { :meta => meta }.deep_merge(opts))
+    total_records = scope.limit(nil).offset(nil).count
+    meta = index_meta(scope, total_records)
+    links = index_links(scope, total_records)
+    render :json => serializer_class.new(scope, { meta: meta, links: links }.deep_merge(opts))
   end
 
-  def index_meta(scope)
+  def index_meta(scope, total_records)
     meta = {
-      :total => scope.limit(nil).offset(nil).count
+      :total => total_records
     }
     meta[:limit] = scope.limit_value if scope.respond_to?(:limit_value) && scope.limit_value
     meta[:offset] = scope.offset_value if scope.respond_to?(:offset_value) && scope.offset_value
     meta
+  end
+
+  def index_links(_scope, total_records)
+    links = {
+      first: same_request_with_parameters(offset: 0, limit: 1),
+      last: same_request_with_parameters(offset: total_records - 1, limit: 1)
+    }
+
+    links[:next] = same_request_with_parameters(next_records_parameters) if params[:limit]
+    links[:previous] = same_request_with_parameters(previous_records_parameters) if params[:offset]
+    links
   end
 
   def render_unprocessable_entity(errors)
@@ -115,6 +129,10 @@ class ApplicationController < ActionController::API
 
   def valid_sort_order?(order, direction, allowed_keys)
     (direction.nil? || %w[asc desc].include?(direction.downcase)) && allowed_keys.include?(order)
+  end
+
+  def same_request_with_parameters(additional_parameters)
+    send("#{controller_name}_url", request.query_parameters.merge(additional_parameters))
   end
 end
 # rubocop:enable Metrics/ClassLength
