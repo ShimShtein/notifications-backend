@@ -5,17 +5,35 @@ module PaginationParameters
 
   def next_records_parameters
     {
-      limit: params[:limit],
-      offset: params[:offset].to_i + params[:limit].to_i
+      limit: limit_param,
+      offset: params[:offset].to_i + limit_param
     }
   end
 
   def previous_records_parameters
     offset = params[:offset].to_i if params[:offset]
-    limit = params[:limit].to_i if params[:limit]
+    limit = limit_param
     {
       limit: offset && offset < limit ? offset : limit,
       offset: [(offset || 0) - limit, 0].max
     }
+  end
+
+  def last_records_parameters(total_records)
+    {
+      offset: [total_records - limit_param, 0].max,
+      limit: limit_param
+    }
+  end
+
+  def first_records_parameters
+    {
+      offset: 0,
+      limit: limit_param
+    }
+  end
+
+  def limit_param
+    params.fetch(:limit, 10).to_i
   end
 end

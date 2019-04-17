@@ -30,14 +30,14 @@ RSpec.describe ApplicationController do
     it 'shows a list of items' do
       request.headers['X-RH-IDENTITY'] = encoded_header
       App.delete_all
-      FactoryBot.create_list(:app, 10, :with_event_type)
+      FactoryBot.create_list(:app, 11, :with_event_type)
 
       get :index
 
       body_json = JSON.parse(response.body)
-      expect(body_json['meta']['total']).to eq(10)
+      expect(body_json['meta']['total']).to eq(11)
       expect(body_json['links']['first']).to match(/offset=0/)
-      expect(body_json['links']['last']).to match(/offset=9/)
+      expect(body_json['links']['last']).to match(/offset=1/)
       expect(response.status).to eq(200)
     end
 

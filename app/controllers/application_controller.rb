@@ -42,11 +42,7 @@ class ApplicationController < ActionController::API
   end
 
   def paginate(scope)
-    limited_scope = scope
-    if params[:limit]
-      limit = params[:limit].to_i
-      limited_scope = limited_scope.limit(limit)
-    end
+    limited_scope = scope.limit(limit_param)
 
     if params[:offset]
       offset = params[:offset].to_i
@@ -106,11 +102,11 @@ class ApplicationController < ActionController::API
 
   def index_links(_scope, total_records)
     links = {
-      first: same_request_with_parameters(offset: 0, limit: 1),
-      last: same_request_with_parameters(offset: total_records - 1, limit: 1)
+      first: same_request_with_parameters(first_records_parameters),
+      last: same_request_with_parameters(last_records_parameters(total_records)),
+      next: same_request_with_parameters(next_records_parameters)
     }
 
-    links[:next] = same_request_with_parameters(next_records_parameters) if params[:limit]
     links[:previous] = same_request_with_parameters(previous_records_parameters) if params[:offset]
     links
   end
