@@ -1,45 +1,12 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/ClassLength
 class ApplicationController < ActionController::API
   include ActionController::Helpers
   include Pundit
   include Authentication
   include Params
   include PaginationParameters
-
-  class UnknownOrder < RuntimeError; end
-  class BadRequest < RuntimeError; end
-
-  rescue_from Pundit::NotAuthorizedError do
-    render json: { errors: 'You are not authorized to access this action.' },
-           status: :forbidden
-  end
-
-  rescue_from StandardError do |exception|
-    render json: { errors: "Server encountered an unexpected error: #{exception.inspect}" },
-           status: :internal_server_error
-  end
-
-  # If a client is not authorized to see an object, the application SHOULD NOT
-  # allow the unauthorized client to determine the existence or non-existence of
-  # an object
-  rescue_from Pundit::NotAuthorizedError do |exception|
-    render_not_found(exception.record.class, exception.record.id)
-  end
-
-  rescue_from ActiveRecord::RecordNotFound do |exception|
-    render_not_found(exception.model, exception.id)
-  end
-
-  rescue_from BadRequest do |exception|
-    render json: { errors: "Server cannot accept given parameters, reason: #{exception.inspect}" },
-           status: :bad_request
-  end
-
-  rescue_from ActiveRecord::SubclassNotFound, UnknownOrder do |exception|
-    render_unprocessable_entity exception
-  end
+  include ErrorHandling
 
   def paginate(scope)
     limited_scope = scope.limit(limit_param)
@@ -103,25 +70,22 @@ class ApplicationController < ActionController::API
   def index_links(_scope, total_records)
     links = {
       first: same_request_with_parameters(first_records_parameters),
-      last: same_request_with_parameters(last_records_parameters(total_records)),
-      next: same_request_with_parameters(next_records_parameters)
+      last: same_request_with_parameters(last_records_parameters(total_records))
     }
 
-    links[:previous] = same_request_with_parameters(previous_records_parameters) if params[:offset]
+    add_dynamic_links(links, total_records)
+
     links
   end
 
-  def render_unprocessable_entity(errors)
-    render :json => { :errors => errors }, :status => :unprocessable_entity
-  end
-
-  def render_not_found(what, id)
-    message = "Could not find #{what}"
-    message += "with 'id'=#{id}" if id
-    render :json => { :errors => message }, :status => :not_found
-  end
-
   private
+
+  def add_dynamic_links(links, total_records)
+    offset = params[:offset].to_i
+
+    links[:next] = same_request_with_parameters(next_records_parameters) if offset + limit_param < total_records
+    links[:previous] = same_request_with_parameters(previous_records_parameters) if offset.positive?
+  end
 
   def valid_sort_order?(order, direction, allowed_keys)
     (direction.nil? || %w[asc desc].include?(direction.downcase)) && allowed_keys.include?(order)
@@ -131,4 +95,3 @@ class ApplicationController < ActionController::API
     send("#{controller_name}_url", request.query_parameters.merge(additional_parameters))
   end
 end
-# rubocop:enable Metrics/ClassLength

@@ -492,7 +492,7 @@
         }
       }
     },
-    "/api/webhooks/endpoints": {
+    "/api/hooks/endpoints": {
       "get": {
         "summary": "List all endpoints",
         "tags": [
@@ -1009,18 +1009,6 @@
             "in": "path",
             "type": "integer",
             "required": true
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "type": "integer",
-            "required": false
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "type": "integer",
-            "required": false
           }
         ],
         "responses": {
@@ -1030,329 +1018,98 @@
               "type": "object",
               "properties": {
                 "data": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "attributes": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "1"
+                    },
+                    "type": {
+                      "type": "string",
+                      "example": "filter"
+                    },
+                    "attributes": {
+                      "type": "object",
+                      "properties": {
                         "enabled": {
                           "type": "boolean"
                         }
-                      },
-                      "relationships": {
-                        "type": "object",
-                        "properties": {
-                          "apps": {
-                            "type": "object",
-                            "properties": {
-                              "data": {
-                                "type": "array",
-                                "items": {
-                                  "type": "object",
-                                  "properties": {
-                                    "id": {
-                                      "type": "string"
-                                    },
-                                    "type": {
-                                      "type": "string"
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          },
-                          "event_types": {
-                            "type": "object",
-                            "properties": {
-                              "data": {
-                                "type": "array",
-                                "items": {
-                                  "type": "object",
-                                  "properties": {
-                                    "id": {
-                                      "type": "string"
-                                    },
-                                    "type": {
-                                      "type": "string"
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          },
-                          "levels": {
-                            "type": "object",
-                            "properties": {
-                              "data": {
-                                "type": "array",
-                                "items": {
-                                  "type": "object",
-                                  "properties": {
-                                    "id": {
-                                      "type": "string"
-                                    },
-                                    "type": {
-                                      "type": "string"
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      },
-                      "type": {
-                        "type": "string"
-                      },
-                      "id": {
-                        "type": "string"
                       }
-                    }
-                  }
-                },
-                "meta": {
-                  "type": "object",
-                  "properties": {
-                    "total": {
-                      "type": "integer"
-                    }
-                  }
-                },
-                "links": {
-                  "type": "object",
-                  "properties": {
-                    "first": {
-                      "type": "string"
-                    },
-                    "last": {
-                      "type": "string"
-                    },
-                    "next": {
-                      "type": "string"
-                    },
-                    "previous": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            },
-            "examples": {
-              "application/json": {
-                "data": [
-                  {
-                    "type": "filter",
-                    "id": "1",
-                    "attributes": {
-                      "enabled": true
                     },
                     "relationships": {
                       "apps": {
-                        "data": [
-                          {
-                            "id": "1",
-                            "type": "app"
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "example": "1"
+                                },
+                                "type": {
+                                  "type": "string"
+                                }
+                              }
+                            }
                           }
-                        ]
+                        }
                       },
                       "event_types": {
-                        "data": [
-                          {
-                            "id": "1",
-                            "type": "event_type"
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "example": "1"
+                                },
+                                "type": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "levels": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "example": "1"
+                                },
+                                "type": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "endpoint": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "1"
                           },
-                          {
-                            "id": 2,
-                            "type": "event_type"
-                          }
-                        ]
-                      },
-                      "levels": {
-                        "data": [
-                          {
-                            "id": "1",
-                            "type": "level"
-                          },
-                          {
-                            "id": 2,
-                            "type": "level"
-                          }
-                        ]
-                      }
-                    }
-                  }
-                ],
-                "meta": {
-                  "total": 3,
-                  "limit": null,
-                  "offset": null
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "summary": "Create a filter",
-        "tags": [
-          "filter"
-        ],
-        "description": "Creates a filter",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "operationId": "CreateFilter",
-        "parameters": [
-          {
-            "name": "X-RH-IDENTITY",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "filter",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "app_ids": {
-                  "type": "array",
-                  "items": "integer"
-                },
-                "event_type_ids": {
-                  "type": "array",
-                  "items": "integer"
-                },
-                "level_ids": {
-                  "type": "array",
-                  "items": "string"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "creates a filter",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "data": {
-                  "attributes": {
-                    "enabled": {
-                      "type": "boolean"
-                    }
-                  },
-                  "relationships": {
-                    "type": "object",
-                    "properties": {
-                      "apps": {
-                        "type": "object",
-                        "properties": {
-                          "data": {
-                            "type": "array",
-                            "items": {
-                              "type": "object",
-                              "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "example": "1"
-                                },
-                                "type": {
-                                  "type": "string"
-                                }
-                              }
-                            }
-                          }
-                        }
-                      },
-                      "event_types": {
-                        "type": "object",
-                        "properties": {
-                          "data": {
-                            "type": "array",
-                            "items": {
-                              "type": "object",
-                              "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "example": "1"
-                                },
-                                "type": {
-                                  "type": "string"
-                                }
-                              }
-                            }
-                          }
-                        }
-                      },
-                      "levels": {
-                        "type": "object",
-                        "properties": {
-                          "data": {
-                            "type": "array",
-                            "items": {
-                              "type": "object",
-                              "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "example": "1"
-                                },
-                                "type": {
-                                  "type": "string"
-                                }
-                              }
-                            }
-                          }
-                        }
-                      },
-                      "event_types": {
-                        "type": "object",
-                        "properties": {
-                          "data": {
-                            "type": "array",
-                            "items": {
-                              "type": "object",
-                              "properties": {
-                                "id": {
-                                  "type": "string"
-                                },
-                                "type": {
-                                  "type": "string"
-                                }
-                              }
-                            }
-                          }
-                        }
-                      },
-                      "levels": {
-                        "type": "object",
-                        "properties": {
-                          "data": {
-                            "type": "array",
-                            "items": {
-                              "type": "object",
-                              "properties": {
-                                "id": {
-                                  "type": "string"
-                                },
-                                "type": {
-                                  "type": "string"
-                                }
-                              }
-                            }
+                          "type": {
+                            "type": "string"
                           }
                         }
                       }
                     }
-                  },
-                  "type": {
-                    "type": "string"
-                  },
-                  "id": {
-                    "type": "string"
                   }
                 }
               }
