@@ -44,19 +44,18 @@ class EndpointsTest < CommitteeTest
     assert_equal levels, created_levels
   end
 
-  # TODO: This test should be uncommented after proper error handling is implemented.
-  # https://github.com/RedHatInsights/notifications-backend/pull/54
-  # test 'Fails to create an endpoint with 422' do
-  #   endpoint = { endpoint: { url: 'foo' } }
-  #
-  #   post endpoints_path, params: endpoint, as: :json, headers: { 'X-RH-IDENTITY' => encoded_header }
-  #
-  #   assert_schema_conform
-  #
-  #   assert_response 422
-  #   result = JSON.parse(response.body)
-  #   assert_match(/can't be blank/, result['errors']['name'])
-  # end
+  test 'Fails to create an endpoint with 422' do
+    endpoint = { endpoint: { url: 'foo' } }
+
+    post endpoints_path, params: endpoint, as: :json, headers: { 'X-RH-IDENTITY' => encoded_header }
+
+    assert_schema_conform
+
+    assert_response 422
+    data = JSON.parse(response.body)
+    name_error = data['errors'].find { |e| e['source']&.fetch('pointer') == '/data/attributes/name' }
+    assert_match(/can't be blank/, name_error['detail'])
+  end
 
   test 'Shows a single endpoint' do
     id = begin
