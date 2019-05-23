@@ -91,9 +91,20 @@ module Documentation
 
       components do
         schema :Endpoint, type: {
+          one_of: %i[HttpEndpoint HttpsEndpoint],
+          discriminator: {
+            propertyName: 'type'
+          }
+        }
+
+        schema :EndpointBase, type: {
           id: { type: String, desc: 'Identifier of the endpoint', example: '6' },
           # There is an issue in ZRO: https://github.com/zhandao/zero-rails_openapi/issues/50 for this prop
-          'type' => { type: String, desc: 'Type of the returned record', enum: ['endpoint'] },
+          'type!' => {
+            type: String,
+            desc: 'Type of the returned record',
+            enum: %w[HttpEndpoint HttpsEndpoint]
+          },
           attributes: {
             name: {
               type: String,
@@ -126,6 +137,24 @@ module Documentation
                     ' this marks when the endpoint "went down"'
             }
           }
+        }
+
+        schema :HttpEndpoint, type: {
+          all_of: [:EndpointBase]
+        }
+
+        schema :HttpsEndpoint, type: {
+          all_of: [
+            :HttpEndpoint,
+            {
+              type: {
+                server_ca_certificate!: {
+                  type: String,
+                  desc: 'Certificate chain to validate the endpoint'
+                }
+              }
+            }
+          ]
         }
       end
     end
