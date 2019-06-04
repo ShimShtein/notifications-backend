@@ -3,8 +3,10 @@
 class AppsController < ApplicationController
   include Documentation::Apps
 
+  allow_sort :name, :title
+
   def index
-    process_index App.includes(:event_types), AppSerializer,
+    process_index App.includes(:event_types).order(sort_parameters), AppSerializer,
                   :opts => { :include => default_includes }
   end
 
